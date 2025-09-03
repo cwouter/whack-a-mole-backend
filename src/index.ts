@@ -11,8 +11,8 @@ type EventMap = {
     ping: { hello?: string };
     echo: unknown;
     broadcast: { msg: string };
-    "game:start": { durationMs?: number } | undefined;
-    "game:end": unknown;
+    "game/start": { durationMs?: number } | undefined;
+    "game/end": unknown;
 };
 
 type InboundMessage =
@@ -68,11 +68,11 @@ wss.on("connection", (ws: WebSocket) => {
                 case "echo":
                     connection.sendEvent("echo", msg.payload);
                     break;
-                case "game:start": {
+                case "game/start": {
                     gameController.gameStart();
                     break;
                 }
-                case "game:end": {
+                case "game/end": {
                     gameController.gameEnd();
                     break;
                 }

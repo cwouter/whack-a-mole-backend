@@ -12,17 +12,17 @@ export default class GameController {
     public gameStart() {
         const { moles, endsAt } = this.gameService.start();
 
-        this.connection.sendEvent("game:started", { moles, endsAt });
+        this.connection.sendEvent("game/started", { moles, endsAt });
         this.gameService.startNominationCycle((mole) => {
-            this.connection.sendEvent("game:nomination", { mole });
+            this.connection.sendEvent("game/nomination", { mole });
         });
         this.gameService.scheduleEnd(() => {
-            this.connection.sendEvent("game:ended", { endedAt: Date.now() });
+            this.connection.sendEvent("game/ended", { endedAt: Date.now() });
         });
     }
 
     public gameEnd() {
         this.gameService.end();
-        this.connection.sendEvent("game:ended", { endedAt: Date.now() });
+        this.connection.sendEvent("game/ended", { endedAt: Date.now() });
     }
 }
