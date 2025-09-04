@@ -4,6 +4,8 @@ import Connection from "./connection.js";
 import GameService from "./features/game/services/gameService.js";
 import GameStore from "./features/game/stores/gameStore.js";
 import GameController from "./features/game/controllers/gameController.js";
+import ScoreService from "./features/score/services/scoreService.js";
+import ScoreStore from "./features/score/stores/scoreStore.js";
 
 const PORT = Number(process.env.PORT) || 8080;
 
@@ -11,7 +13,7 @@ type EventMap = {
     ping: { hello?: string };
     echo: unknown;
     broadcast: { msg: string };
-    "game/start": { durationMs?: number } | undefined;
+    "game/start": { playerName: string };
     "game/end": unknown;
     "game/whack": { id: number };
 };
@@ -42,8 +44,10 @@ wss.on("connection", (ws: WebSocket) => {
 
     const connection = new Connection(ws, wss);
     const gameStore = new GameStore();
+    const scoreStore = new ScoreStore();
     const gameService = new GameService(gameStore);
-    const gameController = new GameController(gameService, connection);
+    const scoreService = new ScoreService(scoreStore);
+    const gameController = new GameController(gameService, scoreService, connection);
 
     connection.sendEvent("welcome", { msg: "Connected", time: Date.now() });
 
@@ -70,7 +74,7 @@ wss.on("connection", (ws: WebSocket) => {
                     connection.sendEvent("echo", msg.payload);
                     break;
                 case "game/start": {
-                    gameController.gameStart();
+                    gameController.gameStart(msg.payload?.playerName);
                     break;
                 }
                 case "game/end": {

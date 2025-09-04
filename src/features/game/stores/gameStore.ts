@@ -2,7 +2,6 @@ import type { Mole } from "../types/game.js";
 
 export interface GameState {
     moles: Record<number, Mole>;
-    score: number;
     running: boolean;
     startedAt?: number;
     endsAt?: number;
@@ -19,8 +18,8 @@ export default class GameStore {
         return this.state;
     }
 
-    private resetState() {
-        this.state = { moles: {}, score: 0, running: false };
+    private resetState(): void {
+        this.state = { moles: {}, running: false };
     }
 
     private createMoles(amount: number): Record<number, Mole> {
@@ -29,18 +28,17 @@ export default class GameStore {
         );
     }
 
-    public start(amount: number, now: number, endsAt: number) {
+    public start(amount: number, now: number, endsAt: number): void {
         this.resetState();
         this.state = {
             moles: this.createMoles(amount),
             running: true,
             startedAt: now,
-            score: 0,
             endsAt
         };
     }
 
-    public nominateMole(id: number) {
+    public nominateMole(id: number): void {
         if (!this.state.moles[id]) {
             throw new Error("Mole not found");
         };
@@ -48,7 +46,7 @@ export default class GameStore {
         this.state.moles[id].state = "mole";
     }
 
-    public setMoleExpiration(id: number, expireAt: number) {
+    public setMoleExpiration(id: number, expireAt: number): void {
         if (!this.state.moles[id]) {
             throw new Error("Mole not found");
         };
@@ -56,7 +54,7 @@ export default class GameStore {
         this.state.moles[id].expireAt = expireAt;
     }
 
-    public expireMole(id: number) {
+    public expireMole(id: number): void {
         if (!this.state.moles[id]) {
             throw new Error("Mole not found");
         };
@@ -64,12 +62,12 @@ export default class GameStore {
         this.state.moles[id].state = "hole";
     }
 
-    public end() {
+    public end(): void {
         this.state.running = false;
         this.resetState();
     };
 
-    public whackMole(id: number) {
+    public whackMole(id: number): Mole {
         if (!this.state.running) {
             throw new Error("Game has not been started");
         }
@@ -83,10 +81,7 @@ export default class GameStore {
             throw new Error("Mole is not visible");
         }
 
-        const score = this.state.moles[id].expireAt ? Math.round((this.state.moles[id].expireAt - Date.now()) / 100) : 0;
-        this.state.score += score;
-
         this.state.moles[id].state = "hole";
-        return this.state.score;
+        return this.state.moles[id];
     };
 }
