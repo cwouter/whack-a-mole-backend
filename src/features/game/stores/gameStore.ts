@@ -70,14 +70,13 @@ export default class GameStore {
     };
 
     public whackMole(id: number) {
-        if (!this.state.moles[id]) {
-            throw new Error("Mole not found");
-        };
-
-        // Anti-cheat detection
         if (!this.state.running) {
             throw new Error("Game has not been started");
         }
+
+        if (!this.state.moles[id]) {
+            throw new Error("Mole not found");
+        };
 
         // Anti-cheat detection
         if (this.state.moles[id].state !== "mole") {

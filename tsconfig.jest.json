@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // For tests we compile as ESM but relax verbatimModuleSyntax so TS doesn't error on ESM syntax in CJS contexts used by Jest
+    "verbatimModuleSyntax": false,
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
+    "isolatedModules": false,
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}
