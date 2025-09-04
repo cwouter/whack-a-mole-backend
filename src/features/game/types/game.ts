@@ -5,4 +5,4 @@ export interface GameConfig {
 
 export type MoleState = 'mole' | 'hole';
 
-export interface Mole { id: number; state: MoleState }
+export interface Mole { id: number; state: MoleState, expireAt?: number }

@@ -57,16 +57,15 @@ export default class GameService {
    * Start a nomination cycle
    * @param callback Callback to be called when a mole is nominated
    */
-  public startNominationCycle(callback: (mole: { id: number, state: "mole" | "hole" }) => void) {
+  public startNominationCycle(callback: (mole: { id: number, state: "mole" | "hole", expireAt?: number }) => void) {
     if (this.nominationInterval) clearInterval(this.nominationInterval);
     this.nominationInterval = setInterval(() => {
       const randomMole = this.nominateMole();
-
-      this.scheduleMoleExpire(randomMole, () => {
+      const expireTimeout = this.scheduleMoleExpire(randomMole, () => {
         callback({ id: randomMole, state: "hole" });
       });
 
-      callback({ id: randomMole, state: "mole" });
+      callback({ id: randomMole, state: "mole", expireAt: Date.now() + expireTimeout });
     }, 1000);
   }
 
@@ -86,13 +85,18 @@ export default class GameService {
    * Schedule a mole to expire
    * @param id The id of the mole to expire
    * @param callback Callback to be called when the mole expires
+   * @returns The timeout in ms
    */
-  public scheduleMoleExpire(id: number, callback: (id: number) => void) {
+  public scheduleMoleExpire(id: number, callback: (id: number) => void): number {
     const randomExpireTimeout = crypto.randomInt(250, 5000);
     this.moleExpireTimeouts.push(setTimeout(() => {
       this.store.expireMole(id);
       callback(id);
     }, randomExpireTimeout));
+
+    this.store.setMoleExpiration(id, Date.now() + randomExpireTimeout);
+
+    return randomExpireTimeout;
   }
 
   /**
@@ -112,5 +116,10 @@ export default class GameService {
     this.store.end();
     this.moleExpireTimeouts.forEach(clearTimeout);
     this.moleExpireTimeouts = [];
+  }
+
+  public whackMole(id: number) {
+    const score = this.store.whackMole(id);
+    return score;
   }
 }

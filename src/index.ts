@@ -13,6 +13,7 @@ type EventMap = {
     broadcast: { msg: string };
     "game/start": { durationMs?: number } | undefined;
     "game/end": unknown;
+    "game/whack": { id: number };
 };
 
 type InboundMessage =
@@ -74,6 +75,10 @@ wss.on("connection", (ws: WebSocket) => {
                 }
                 case "game/end": {
                     gameController.gameEnd();
+                    break;
+                }
+                case "game/whack": {
+                    gameController.whackMole(msg.payload.id);
                     break;
                 }
                 case "broadcast": {

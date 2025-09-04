@@ -25,4 +25,9 @@ export default class GameController {
         this.gameService.end();
         this.connection.sendEvent("game/ended", { endedAt: Date.now() });
     }
+
+    public whackMole(id: number) {
+        const score = this.gameService.whackMole(id);
+        this.connection.sendEvent("game/whacked", { id, score });
+    }
 }
